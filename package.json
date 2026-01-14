@@ -3,10 +3,10 @@
     "version": "0.1.0",
     "private": true,
     "scripts": {
-        "dev": "next dev --turbopack",
-        "build": "next build",
-        "start": "next start",
-        "lint": "next lint"
+        "dev": "node node_modules/next/dist/bin/next dev --turbopack",
+        "build": "node node_modules/next/dist/bin/next build",
+        "start": "node node_modules/next/dist/bin/next start",
+        "lint": "node node_modules/next/dist/bin/next lint"
     },
     "dependencies": {
         "@babel/parser": "^7.28.5",
@@ -67,6 +67,7 @@
         "estree-walker": "2.0.2",
         "framer-motion": "^12.23.24",
         "input-otp": "^1.4.2",
+        "lightningcss": "^1.30.2",
         "lucide-react": "^0.552.0",
         "mini-svg-data-uri": "^1.4.4",
         "motion": "^12.23.24",
