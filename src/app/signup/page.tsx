@@ -36,7 +36,7 @@ import { SignUpButton } from "@clerk/nextjs";
               />
             </div>
             <h1 className="text-[24px] font-bold text-foreground tracking-tight">Create your account</h1>
-            <p className="text-muted-foreground text-[14px] mt-2">Join trae.ai and start building today</p>
+            <p className="text-muted-foreground text-[14px] mt-2">Join Piepio.com and start building today</p>
           </div>
 
           <SignUpButton mode="redirect">

@@ -35,7 +35,7 @@ import { SignInButton } from "@clerk/nextjs";
                 className="object-contain"
               />
             </div>
-            <h1 className="text-[24px] font-bold text-foreground tracking-tight">Welcome to trae.ai</h1>
+            <h1 className="text-[24px] font-bold text-foreground tracking-tight">Welcome to Piepio.com</h1>
             <p className="text-muted-foreground text-[14px] mt-2">Sign in to your account to continue</p>
           </div>
 

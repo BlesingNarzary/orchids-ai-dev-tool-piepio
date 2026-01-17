@@ -7,8 +7,8 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { ClerkProvider } from "@clerk/nextjs";
 
 export const metadata: Metadata = {
-  title: "trae.ai – AI Full-Stack Engineering Platform",
-  description: "trae.ai builds and wires your frontend, backend, auth, database, and payments.",
+  title: "Piepio.com – AI Full-Stack Engineering Platform",
+  description: "Piepio.com builds and wires your frontend, backend, auth, database, and payments.",
 };
 
 export default function RootLayout({
