@@ -1,31 +1,22 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
 import { db } from "@/db/client";
 import { projects } from "@/db/schema";
 import { eq } from "drizzle-orm";
+import { requireDbUser } from "@/lib/require-db-user";
 
 export async function GET() {
-  const { userId } = auth();
-
-  if (!userId) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const user = await requireDbUser();
 
   const rows = await db
     .select()
     .from(projects)
-    .where(eq(projects.ownerId, userId as any));
+    .where(eq(projects.ownerId, user.id));
 
   return NextResponse.json({ projects: rows }, { status: 200 });
 }
 
 export async function POST(req: NextRequest) {
-  const { userId } = auth();
-
-  if (!userId) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
+  const user = await requireDbUser();
   const body = await req.json();
   const name = body.name as string | undefined;
   const description = body.description as string | undefined;
@@ -37,7 +28,7 @@ export async function POST(req: NextRequest) {
   const [created] = await db
     .insert(projects)
     .values({
-      ownerId: userId as any,
+      ownerId: user.id,
       name,
       description: description || null,
     })
@@ -45,4 +36,3 @@ export async function POST(req: NextRequest) {
 
   return NextResponse.json({ project: created }, { status: 201 });
 }
-
