@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
+import { requireDbUser } from "@/lib/require-db-user";
 
 const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
 const appBaseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
@@ -17,6 +18,8 @@ export async function POST(req: NextRequest) {
   });
 
   try {
+    const user = await requireDbUser();
+
     const body = await req.json();
     const { priceId } = body as { priceId?: string };
 
@@ -30,8 +33,12 @@ export async function POST(req: NextRequest) {
     const session = await stripe.checkout.sessions.create({
       mode: "subscription",
       line_items: [{ price: priceId, quantity: 1 }],
-      success_url: `${appBaseUrl}/?checkout=success`,
-      cancel_url: `${appBaseUrl}/?checkout=cancelled`,
+      success_url: `${appBaseUrl}/dashboard?checkout=success`,
+      cancel_url: `${appBaseUrl}/dashboard?checkout=cancelled`,
+      customer_email: user.email,
+      metadata: {
+        userId: user.id,
+      },
     });
 
     return NextResponse.json({ url: session.url }, { status: 200 });
@@ -42,4 +49,3 @@ export async function POST(req: NextRequest) {
     );
   }
 }
-
