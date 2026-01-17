@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { db } from "@/db/client";
 import { subscriptions } from "@/db/schema";
-import { eq } from "drizzle-orm";
 
 export async function POST(req: NextRequest) {
   const secret = process.env.STRIPE_WEBHOOK_SECRET;
@@ -31,11 +30,16 @@ export async function POST(req: NextRequest) {
   if (event.type === "customer.subscription.updated" || event.type === "customer.subscription.created") {
     const subscription = event.data.object as Stripe.Subscription;
     const customerId = subscription.customer as string;
+    const userId = subscription.metadata.userId as string | undefined;
+
+    if (!userId) {
+      return NextResponse.json({ error: "Missing userId metadata" }, { status: 400 });
+    }
 
     await db
       .insert(subscriptions)
       .values({
-        userId: "" as any,
+        userId: userId as any,
         stripeCustomerId: customerId,
         stripeSubscriptionId: subscription.id,
         plan: subscription.items.data[0]?.price.id ?? "",
@@ -53,4 +57,3 @@ export async function POST(req: NextRequest) {
 
   return NextResponse.json({ received: true }, { status: 200 });
 }
-
