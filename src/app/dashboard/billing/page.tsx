@@ -1,0 +1,46 @@
+import { requireDbUser } from "@/lib/require-db-user";
+import { getActiveSubscriptionForUser } from "@/lib/subscription";
+import { UpgradeButton } from "../UpgradeButton";
+
+export default async function BillingPage() {
+  const user = await requireDbUser();
+  const subscription = await getActiveSubscriptionForUser(user.id);
+
+  return (
+    <main className="min-h-[calc(100vh-3.5rem)] bg-background">
+      <div className="max-w-6xl mx-auto py-6 space-y-6">
+        <div className="flex items-center justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-semibold tracking-tight">
+              Billing
+            </h1>
+            <p className="text-sm text-muted-foreground mt-1">
+              Manage your Piepio plan.
+            </p>
+          </div>
+        </div>
+        <div className="border border-border rounded-2xl p-6 space-y-4 bg-card">
+          <div className="flex items-center justify-between gap-4">
+            <div>
+              <div className="text-xs uppercase tracking-wide text-muted-foreground">
+                Current plan
+              </div>
+              <div className="text-lg font-semibold">
+                {subscription ? subscription.plan : "Free"}
+              </div>
+              {!subscription && (
+                <p className="text-xs text-muted-foreground mt-1">
+                  Upgrade to Pro to unlock higher limits and priority generation.
+                </p>
+              )}
+            </div>
+            <div>
+              {!subscription && <UpgradeButton />}
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  );
+}
+
