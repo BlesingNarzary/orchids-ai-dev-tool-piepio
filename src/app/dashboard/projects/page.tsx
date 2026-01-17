@@ -1,7 +1,7 @@
 import { db } from "@/db/client";
 import { projects } from "@/db/schema";
 import { requireDbUser } from "@/lib/require-db-user";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -24,6 +24,53 @@ async function createProject(formData: FormData) {
     ownerId: user.id,
     name,
     description: description || null,
+  });
+}
+
+async function deleteProject(formData: FormData) {
+  "use server";
+
+  const user = await requireDbUser();
+  const id = String(formData.get("projectId") ?? "").trim();
+
+  if (!id) {
+    return;
+  }
+
+  await db
+    .delete(projects)
+    .where(and(eq(projects.id, id), eq(projects.ownerId, user.id)));
+}
+
+async function duplicateProject(formData: FormData) {
+  "use server";
+
+  const user = await requireDbUser();
+  const id = String(formData.get("projectId") ?? "").trim();
+
+  if (!id) {
+    return;
+  }
+
+  const [project] = await db
+    .select()
+    .from(projects)
+    .where(and(eq(projects.id, id), eq(projects.ownerId, user.id)))
+    .limit(1);
+
+  if (!project) {
+    return;
+  }
+
+  const copyName =
+    project.name.endsWith(" copy") || project.name.endsWith(" copy)")
+      ? project.name
+      : `${project.name} copy`;
+
+  await db.insert(projects).values({
+    ownerId: user.id,
+    name: copyName,
+    description: project.description,
   });
 }
 
@@ -135,12 +182,18 @@ export default async function ProjectsPage() {
                         Open
                       </Button>
                     </Link>
-                    <Button variant="outline" size="sm">
-                      Duplicate
-                    </Button>
-                    <Button variant="outline" size="sm">
-                      Delete
-                    </Button>
+                    <form action={duplicateProject}>
+                      <input type="hidden" name="projectId" value={project.id} />
+                      <Button variant="outline" size="sm" type="submit">
+                        Duplicate
+                      </Button>
+                    </form>
+                    <form action={deleteProject}>
+                      <input type="hidden" name="projectId" value={project.id} />
+                      <Button variant="outline" size="sm" type="submit">
+                        Delete
+                      </Button>
+                    </form>
                   </div>
                 </li>
               ))}
